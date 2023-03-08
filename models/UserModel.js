@@ -20,7 +20,7 @@ const Users = db.define('users', {
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         validate:{
             notEmpty: true,
             len: [3, 100]
@@ -40,6 +40,13 @@ const Users = db.define('users', {
         validate:{
             notEmpty: true,
             isEmail: true
+        }
+    },
+    phone: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        validate: {
+             notEmpty: false,              
         }
     },
     password:{
@@ -63,6 +70,9 @@ const Users = db.define('users', {
         validate:{
             notEmpty: true
         }
+    },
+    refresh_token: {
+        type: DataTypes.TEXT
     }
 
 }, {

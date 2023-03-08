@@ -2,24 +2,50 @@ import Product from "../models/ProductModel.js";
 import User from "../models/UserModel.js";
 import path from "path";
 import fs from "fs";
+import Categories from "../models/CategoryModel.js";
+import { Op } from "sequelize";
 
-export const getProducts = async(req, res) =>{
+
+export const getProducts2 = async (req, res) => {        
     try {
         let response;
-        response = await Product.findAll({
-                attributes:['uuid','name','price'],
-                where:{
-                    userId: req.userId
-                },
+        const { category, allCategory } = req.query
+        if (category) {
+            response = await Product.findAll({
+                attributes:['uuid','name','price','category_id','image','url'],                
                 include:[{
-                    model: User, as: "users",
-                    attributes:['name','email']
+                    model: Categories, as: "category",
+                    where :  {
+                        [Op.or]: [{name: {
+                            [Op.like] : '%'+category+'%'
+                        }}]
+                    },
+                    attributes: ['uuid','name']
                 }]
-        });
-        res.status(200).json(response);
+            });
+        }
+        if (allCategory) {
+            response = await Product.findAll({
+                attributes:['uuid','name','price','category_id','image','url'],                
+                include:[{
+                    model: Categories, as: "category",
+                    attributes: ['uuid','name']
+                }]
+            });
+        }
+        if(!category) {
+            response = await Product.findAll({
+                attributes:['uuid','name','price','category_id','image','url'],                
+                include:[{
+                    model: Categories, as: "category",
+                    attributes: ['uuid','name']
+                }]
+            });
+        }
+    res.status(200).json(response);
     } catch (error) {
         res.status(500).json({msg: error.message});
-    }    
+    }
 }
 
 export const getProductById = async(req, res) =>{

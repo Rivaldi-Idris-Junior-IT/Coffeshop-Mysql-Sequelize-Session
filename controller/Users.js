@@ -17,9 +17,23 @@ export const getUsers = async(req, res) =>{
 export const getUserById = async(req, res) =>{
     try {
         const response = await User.findOne({
-            attributes:['uuid','name','email','role','image'],
+            attributes:['uuid','name','email','phone','role','image'],
             where: {
                 uuid: req.params.id
+            }
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({msg: error.message});
+    }
+}
+
+export const getUserProfile = async(req, res) =>{
+    try {
+        const response = await User.findOne({
+            attributes:['uuid','name','email','phone','role','image','url'],
+            where: {
+                email: req.email
             }
         });
         res.status(200).json(response);

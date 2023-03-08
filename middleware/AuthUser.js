@@ -1,4 +1,5 @@
 import User from "../models/UserModel.js";
+import jwt from "jsonwebtoken";
 
 export const verifyUser = async (req, res, next) =>{
     if(!req.session.userId){
@@ -16,12 +17,10 @@ export const verifyUser = async (req, res, next) =>{
 }
 
 export const adminOnly = async (req, res, next) =>{
-    const user = await User.findOne({
-        where: {
-            uuid: req.session.userId
-        }
-    });
-    if(!user) return res.status(404).json({msg: "User tidak ditemukan"});
-    if(user.role !== "admin") return res.status(403).json({msg: "Akses terlarang"});
+    const refreshToken = req.cookies.refreshToken;
+    const verified = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+    const role =  verified.role;
+    if(!role) return res.status(404).json({msg: "User tidak ditemukan"});
+    if(role !== "admin") return res.status(403).json({msg: "Akses terlarang"});
     next();
 }

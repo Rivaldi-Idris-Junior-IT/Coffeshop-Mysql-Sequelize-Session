@@ -26,6 +26,13 @@ const Products = db.define('product', {
             len: [3, 100]
         }
     },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        validate: {
+            notEmpty: false,
+        }
+    },
     price:{
         type: DataTypes.INTEGER,
         allowNull: false,

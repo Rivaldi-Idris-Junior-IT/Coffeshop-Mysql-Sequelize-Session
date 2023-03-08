@@ -6,6 +6,8 @@ import session from "express-session";
 import SequelizeStore from "connect-session-sequelize";
 import dotenv from "dotenv";
 
+import cookieparser from "cookie-parser";
+
 import UserRoute from "./routes/UserRoute.js";
 import CategoryRoute from "./routes/CategoryRoute.js";
 import ProductRoute from "./routes/ProductRoute.js";
@@ -18,27 +20,20 @@ const app = express();
 //     await db.sync();
 // })();
 
-const sessionStore = SequelizeStore(session.Store);
+try { 
+    await db.authenticate();
+    console.log('Database Connected..');    
+}catch (error) {
+    console.error(error)
+}
 
-const store = new sessionStore({
-    db:db
-})
-
-
-app.use(session({
-    secret: process.env.SESS_SECRET,
-    resave: false,
-    saveUninitialized: true,    
-    store: store,
-    cookie: {
-        secure: 'auto'
-    }
-}));
 
 app.use(cors({
     credentials: true,
     origin: 'http://localhost:3000'
 }));
+
+app.use(cookieparser());
 
 app.use(express.json());
 app.use(FileUpload());
@@ -49,5 +44,5 @@ app.use(ProductRoute);
 app.use(AuthRoute);
 
 app.listen(process.env.APP_PORT, ()=> {
-    console.log('Server running at port 5000')
+    console.log(`Server running at port ${process.env.APP_PORT}`)
 });
